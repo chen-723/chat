@@ -1,0 +1,76 @@
+version: "3.9"
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: chat_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: chat_demo
+      MYSQL_USER: chat_user
+      MYSQL_PASSWORD: 123456
+      TZ: Asia/Shanghai          # <— 新增
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro  # <— 新增
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 后端服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chat_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # 数据库配置
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=chat_user
+      - DB_PASSWORD=123456
+      - DB_DATABASE=chat_demo
+      # JWT配置
+      - SECRET_KEY=d8f4e7a1c2b9f3e5a6d0c8b4f2e1a7c9d5b0f8e2c1a9d6b3f7e4c0a2b5f9e8d1
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=600
+      # CORS配置
+      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      # 服务器配置
+      - SERVER_HOST=localhost
+      - SERVER_PORT=8000
+      - TZ=Asia/Shanghai          # <— 新增
+    volumes:
+      - ./backend/static:/app/static
+      - /etc/localtime:/etc/localtime:ro  # <— 新增
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: chat_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - TZ=Asia/Shanghai          # <— 新增
+    volumes:
+      - /etc/localtime:/etc/localtime:ro  # <— 新增
+
+volumes:
+  mysql_data:
