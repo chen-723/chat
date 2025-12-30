@@ -46,7 +46,7 @@ services:
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=600
       # CORS配置
-      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://209.74.81.100:3000
       # 服务器配置
       - SERVER_HOST=localhost
       - SERVER_PORT=8000
@@ -67,10 +67,10 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - TZ=Asia/Shanghai          # <— 新增
+      - NEXT_PUBLIC_API_URL=https://209.74.81.100:8000
+      - TZ=Asia/Shanghai
     volumes:
-      - /etc/localtime:/etc/localtime:ro  # <— 新增
+      - /etc/localtime:/etc/localtime:ro
 
 volumes:
   mysql_data:

@@ -4,6 +4,7 @@ import { Contact, getContacts } from '@/utils/api/contact';
 import { getMessages, Message } from '@/utils/api/messages';
 import { getGroups, Groups } from '@/utils/api/group';
 import { wsClient } from '@/utils/websocket';
+import SERVER_CONFIG from '@/config/server';
 
 type Props = {
     activeMenu: string;
@@ -364,6 +365,13 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
             onUnreadChange(privateUnread, groupUnread);
         }
     }, [contacts, groups, onUnreadChange]);
+
+    // 处理头像 URL
+    const getAvatarUrl = (avatar: string | null | undefined) => {
+        if (!avatar) return '/avatar/Profile.png';
+        return avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+    };
+
     return (
         <div className=''>
             {activeMenu === '聊天' &&
@@ -382,7 +390,7 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
                             >
                                 <div className="relative shrink-0">
                                     <img
-                                        src={item.avatar || '/avatar/Profile.png'}
+                                        src={getAvatarUrl(item.avatar)}
                                         alt={item.name}
                                         width={48}
                                         height={48}
@@ -446,7 +454,7 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
                                             {/* 头像 */}
                                             <div className="relative shrink-0 ml-3">
                                                 <img
-                                                    src={item.avatar || "/avatar/Profile.png"}
+                                                    src={getAvatarUrl(item.avatar)}
                                                     alt={item.name}
                                                     width={48}
                                                     height={48}
@@ -513,7 +521,7 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
                                             {/* 头像 + 在线状态 */}
                                             <div className="relative shrink-0 ml-3">
                                                 <img
-                                                    src={item.avatar || "/avatar/Profile.png"}
+                                                    src={getAvatarUrl(item.avatar)}
                                                     alt={item.name}
                                                     width={48}
                                                     height={48}
