@@ -71,3 +71,5 @@ frontend/*.md
 frontend/certificates
 
 *.md
+*.pyc
+*.txt
