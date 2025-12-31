@@ -46,11 +46,11 @@ services:
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=600
       # CORS配置
-      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://209.74.81.100:3000
+      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://www.372810.xyz
       # 服务器配置
-      - SERVER_HOST=localhost
-      - SERVER_PORT=8000
-      - TZ=Asia/Shanghai          # <— 新增
+      - SERVER_HOST=www.372810.xyz
+      - SERVER_PORT=443
+      - TZ=Asia/Shanghai
     volumes:
       - ./backend/static:/app/static
       - /etc/localtime:/etc/localtime:ro  # <— 新增
@@ -67,7 +67,7 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=https://209.74.81.100:8000
+      - NEXT_PUBLIC_API_URL=https://www.372810.xyz
       - TZ=Asia/Shanghai
     volumes:
       - /etc/localtime:/etc/localtime:ro

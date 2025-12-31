@@ -1,4 +1,10 @@
 import type { NextConfig } from "next";
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  // disable: process.env.NODE_ENV === 'development'
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -11,8 +17,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '209.74.81.100',
-        port: '8000',
+        hostname: 'www.372810.xyz',
         pathname: '/static/**',
       },
     ],
@@ -21,9 +26,13 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:8000', '209.74.81.100:8000'],
+      allowedOrigins: ['localhost:8000', 'www.372810.xyz'],
     },
+  },
+  // 添加空的 webpack 配置以消除警告
+  webpack: (config) => {
+    return config;
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

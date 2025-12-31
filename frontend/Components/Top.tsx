@@ -351,9 +351,7 @@ export default function Top({ activeMenu, chatWith, setActiveMenu, setChatWith, 
                     <div className='grid grid-cols-2 gap-1 items-center'>
                         <svg
                             onClick={() => {
-                                if (from) {
-                                    setActiveMenu(from);
-                                } else {
+                                {
                                     setActiveMenu('聊天');
                                 }
                             }}

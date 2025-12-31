@@ -16,8 +16,8 @@ if __name__ == "__main__":
         backlog=2048,  # 增加连接队列
         # ↓↓↓ 新增：本地 https，证书用 mkcert 生成的
         #如果不用本地开发就注释掉下面两行
-        ssl_keyfile="localhost.key",   # 私钥
-        ssl_certfile="localhost.crt",  # 证书
+        # ssl_keyfile="localhost.key",   # 私钥
+        # ssl_certfile="localhost.crt",  # 证书
     )
 
 

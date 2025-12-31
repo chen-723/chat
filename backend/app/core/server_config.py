@@ -9,6 +9,7 @@ import os
 # 生产环境改为服务器IP，例如: '192.168.1.100'
 # SERVER_HOST = os.getenv("SERVER_HOST", "localhost")
 SERVER_HOST = os.getenv("SERVER_HOST", "209.74.81.100")
+# SERVER_HOST = os.getenv("SERVER_HOST", "192.168.2.38")
 
 # 服务器端口
 SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
@@ -16,8 +17,16 @@ SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
 # 获取完整的服务器地址
 def get_server_url() -> str:
     """返回完整的服务器URL"""
-    #这里记得修改有没有https
-    return f"https://{SERVER_HOST}:{SERVER_PORT}"
+    # 如果是域名且端口是443，使用https不带端口
+    if SERVER_PORT == 443:
+        return f"https://{SERVER_HOST}"
+    # 如果是域名且端口是80，使用http不带端口
+    elif SERVER_PORT == 80:
+        return f"http://{SERVER_HOST}"
+    # 其他情况带端口
+    else:
+        protocol = "https" if SERVER_PORT == 8000 else "http"
+        return f"{protocol}://{SERVER_HOST}:{SERVER_PORT}"
 
 # 获取静态文件访问地址
 def get_static_url(path: str) -> str:
