@@ -4,7 +4,13 @@ WORKDIR /app
 
 # 复制依赖文件
 COPY package*.json ./
-RUN npm ci
+
+# 使用国内镜像源加速，并行下载
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm ci --prefer-offline --no-audit
 
 # 复制源码和配置
 COPY . .

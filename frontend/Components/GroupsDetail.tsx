@@ -9,6 +9,7 @@ import SERVER_CONFIG from '@/config/server';
 import AddGroupMember from './AddGroupMember';
 import ManageMember from './ManageMember';
 import { getMe } from '@/utils/api/auth';
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -144,12 +145,15 @@ export default function GroupsDetail({ activeMenu, setActiveMenu, chatWith, edit
             <div>
                 <div className='flex justify-center mt-5'>
                     <div className="relative inline-block">
-                        <img
-                            src={groupDetail?.avatar || "/avatar/Profile.png"}
-                            alt={groupDetail?.name}
-                            className="w-[100px] h-[100px] rounded-lg object-cover"
-                        />
-
+                        {groupDetail?.avatar ? (
+                            <img
+                                src={groupDetail.avatar}
+                                alt={groupDetail.name}
+                                className="w-[100px] h-[100px] rounded-lg object-cover"
+                            />
+                        ) : (
+                            <InitialsAvatar name={groupDetail?.name || "群聊"} size={100} className="rounded-lg" />
+                        )}
                     </div>
                 </div>
                 {groupDetail?.created_at && (
@@ -217,10 +221,6 @@ export default function GroupsDetail({ activeMenu, setActiveMenu, chatWith, edit
                     msOverflowStyle: 'none',
                 }}>
                 {groupMembersdata?.map((item) => {
-                    const avatarUrl = item.avatar
-                        ? (item.avatar.startsWith('http') ? item.avatar : `${SERVER_CONFIG.API_BASE_URL}${item.avatar}`)
-                        : "/avatar/Profile.png";
-
                     return (
                         <div key={item.id} className="flex items-center space-x-4 border-b border-gray-100 h-17 pb-3 shrink-0 px-3 cursor-pointer hover:bg-gray-50"
                             onClick={() => {
@@ -240,15 +240,25 @@ export default function GroupsDetail({ activeMenu, setActiveMenu, chatWith, edit
                             }}>
                             {/* 头像 + */}
                             <div className="relative shrink-0">
-                                <img
-                                    src={avatarUrl}
-                                    alt={item.username}
-                                    className="w-12 h-12 rounded-lg object-cover"
-                                    onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.src = "/avatar/Profile.png";
-                                    }}
-                                />
+                                {item.avatar ? (
+                                    <img
+                                        src={item.avatar.startsWith('http') ? item.avatar : `${SERVER_CONFIG.API_BASE_URL}${item.avatar}`}
+                                        alt={item.username}
+                                        className="w-12 h-12 rounded-lg object-cover"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.onerror = null;
+                                            target.style.display = 'none';
+                                            const parent = target.parentElement;
+                                            if (parent) {
+                                                const avatar = document.createElement('div');
+                                                parent.appendChild(avatar);
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <InitialsAvatar name={item.username} size={48} className="rounded-lg" />
+                                )}
                             </div>
 
                             {/* 右侧信息 */}

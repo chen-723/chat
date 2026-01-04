@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light;
+  /* 强制浅色模式 */
 }
 
 @theme inline {
@@ -12,12 +14,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* 移除深色模式支持 */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   background: var(--background);
@@ -25,15 +28,30 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+* {
+  /* 禁止双击缩放 */
+  touch-action: manipulation;
+}
+
 html {
   overflow-x: hidden;
+  /* 禁止缩放 */
+  touch-action: pan-y;
 }
+
 body {
   margin: 0 auto;
   max-width: 100%;
   min-height: 100vh;
-  background: #fafafa; 
-  touch-action: manipulation; 
+  background: #fafafa;
+  touch-action: manipulation;
+  /* 禁止文本选择和双击缩放 */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  /* 禁止双击放大 */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 /* 隐藏滚动条 */

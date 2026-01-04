@@ -4,6 +4,7 @@ import { wsClient } from '@/utils/websocket';
 import { AudioManager } from '@/utils/audioManager';
 import { getMe } from '@/utils/api/auth';
 import SERVER_CONFIG from '@/config/server';
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -240,10 +241,19 @@ export default function Callpage({ activeMenu, chatWith, setActiveMenu }: Props)
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
-    // 处理头像 URL
-    const getAvatarUrl = (avatar: string | null | undefined) => {
-        if (!avatar) return '/avatar/Profile.png';
-        return avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+    // 渲染头像
+    const renderAvatar = (avatar: string | null | undefined, name: string, size: number = 100) => {
+        if (avatar) {
+            const avatarUrl = avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+            return (
+                <img
+                    src={avatarUrl}
+                    alt={name}
+                    className="w-[100px] h-[100px] rounded-lg object-cover"
+                />
+            );
+        }
+        return <InitialsAvatar name={name} size={size} className="rounded-lg" />;
     };
 
     // 发起通话界面
@@ -252,11 +262,7 @@ export default function Callpage({ activeMenu, chatWith, setActiveMenu }: Props)
             <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-blue-50 to-white">
                 <div className='flex justify-center mt-15'>
                     <div className="relative inline-block">
-                        <img
-                            src={getAvatarUrl(chatWith?.avatar)}
-                            alt={chatWith?.name}
-                            className="w-[100px] h-[100px] rounded-lg object-cover"
-                        />
+                        {renderAvatar(chatWith?.avatar, chatWith?.name || "用户")}
                     </div>
                 </div>
                 <div className='flex justify-center mt-6 font-bold text-xl'>
@@ -285,11 +291,7 @@ export default function Callpage({ activeMenu, chatWith, setActiveMenu }: Props)
             <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-green-50 to-white">
                 <div className='flex justify-center mt-15'>
                     <div className="relative inline-block">
-                        <img
-                            src={getAvatarUrl(incomingCall.caller_avatar)}
-                            alt={incomingCall.caller_name}
-                            className="w-[100px] h-[100px] rounded-lg object-cover animate-pulse"
-                        />
+                        {renderAvatar(incomingCall.caller_avatar, incomingCall.caller_name)}
                     </div>
                 </div>
                 <div className='flex justify-center mt-6 font-bold text-xl'>
@@ -328,11 +330,10 @@ export default function Callpage({ activeMenu, chatWith, setActiveMenu }: Props)
             <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-blue-50 to-white">
                 <div className='flex justify-center mt-15'>
                     <div className="relative inline-block">
-                        <img
-                            src={getAvatarUrl(chatWith?.avatar || incomingCall?.caller_avatar)}
-                            alt={chatWith?.name || incomingCall?.caller_name}
-                            className="w-[100px] h-[100px] rounded-lg object-cover"
-                        />
+                        {renderAvatar(
+                            chatWith?.avatar || incomingCall?.caller_avatar,
+                            chatWith?.name || incomingCall?.caller_name || "用户"
+                        )}
                     </div>
                 </div>
                 <div className='flex justify-center mt-6 font-bold text-xl'>

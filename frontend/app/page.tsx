@@ -104,7 +104,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full mx-auto min-h-screen bg-white">
+    <div className="h-screen flex flex-col bg-white overflow-hidden">
       {/* <Test /> */}
 
       <Login

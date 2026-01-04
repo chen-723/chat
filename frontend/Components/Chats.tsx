@@ -5,6 +5,8 @@ import { getMessages, Message } from '@/utils/api/messages';
 import { getGroups, Groups } from '@/utils/api/group';
 import { wsClient } from '@/utils/websocket';
 import SERVER_CONFIG from '@/config/server';
+import { useThrottle } from '@/utils/useDebounce';
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -33,6 +35,24 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
     const [contacts, setContacts] = useState<ContactWithLastMessage[]>([]);
     const [groups, setGroups] = useState<GroupWithLastMessage[]>([]);
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+    // 节流处理点击事件，防止快速重复点击
+    const handleChatClick = useThrottle((chat: { name: string; id: number; avatar: string | null }, menu: '聊天详情' | '群聊天详情', isGroup: boolean) => {
+        setChatWith(chat);
+        setActiveMenu(menu);
+        setFrom('聊天');
+
+        // 清零未读数
+        if (isGroup) {
+            setGroups(prev => prev.map(g =>
+                g.id === chat.id ? { ...g, unreadCount: 0 } : g
+            ));
+        } else {
+            setContacts(prev => prev.map(c =>
+                c.user_id === chat.id ? { ...c, count: 0 } : c
+            ));
+        }
+    }, 500); // 500ms 内只能点击一次
 
     // 获取当前用户ID
     useEffect(() => {
@@ -366,10 +386,21 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
         }
     }, [contacts, groups, onUnreadChange]);
 
-    // 处理头像 URL
-    const getAvatarUrl = (avatar: string | null | undefined) => {
-        if (!avatar) return '/avatar/Profile.png';
-        return avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+    // 处理头像渲染
+    const renderAvatar = (avatar: string | null | undefined, name: string, size: number = 48) => {
+        if (avatar) {
+            const avatarUrl = avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+            return (
+                <img
+                    src={avatarUrl}
+                    alt={name}
+                    width={size}
+                    height={size}
+                    className={`w-${size === 48 ? '12' : '12'} h-${size === 48 ? '12' : '12'} rounded-lg object-cover`}
+                />
+            );
+        }
+        return <InitialsAvatar name={name} size={size} className="rounded-lg" />;
     };
 
     return (
@@ -382,20 +413,14 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
                             <div
                                 key={item.id}
                                 className="flex flex-col items-center shrink-0 ml-1 mb-1 cursor-pointer"
-                                onClick={() => {
-                                    setChatWith({ name: item.name, id: item.user_id, avatar: item.avatar });
-                                    setActiveMenu('聊天详情');
-                                    setFrom('聊天');
-                                }}
+                                onClick={() => handleChatClick(
+                                    { name: item.name, id: item.user_id, avatar: item.avatar },
+                                    '聊天详情',
+                                    false
+                                )}
                             >
                                 <div className="relative shrink-0">
-                                    <img
-                                        src={getAvatarUrl(item.avatar)}
-                                        alt={item.name}
-                                        width={48}
-                                        height={48}
-                                        className="w-12 h-12 rounded-lg object-cover"
-                                    />
+                                    {renderAvatar(item.avatar, item.name)}
                                     {item.status === 'online' && (
                                         <span className="absolute -bottom-1 left-9.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
                                     )}
@@ -413,8 +438,8 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
                     <div
                         className={
                             `flex flex-col mt-2 space-y-3 w-full overflow-y-auto scrollbar-hide ${favoriteList.length > 0
-                                ? 'max-h-[calc(100vh-239px)]'
-                                : 'max-h-[calc(100vh-167px)]'
+                                ? 'max-h-[calc(100dvh-239px)]'
+                                : 'max-h-[calc(100dvh-167px)]'
                             }`
                         }
                         style={{
@@ -441,25 +466,14 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
                                 return (
                                     <div key={`group-${item.id}`}>
                                         <div className="flex items-center space-x-4 border-b border-gray-100 h-17 pb-3 shrink-0"
-                                            onClick={() => {
-                                                setChatWith({ name: item.name, id: item.id, avatar: item.avatar });
-                                                setActiveMenu('群聊天详情');
-                                                setFrom('聊天');
-
-                                                // 点击进入聊天时，立即清零未读数（UI优化）
-                                                setGroups(prev => prev.map(g =>
-                                                    g.id === item.id ? { ...g, unreadCount: 0 } : g
-                                                ));
-                                            }}>
+                                            onClick={() => handleChatClick(
+                                                { name: item.name, id: item.id, avatar: item.avatar },
+                                                '群聊天详情',
+                                                true
+                                            )}>
                                             {/* 头像 */}
                                             <div className="relative shrink-0 ml-3">
-                                                <img
-                                                    src={getAvatarUrl(item.avatar)}
-                                                    alt={item.name}
-                                                    width={48}
-                                                    height={48}
-                                                    className="w-12 h-12 rounded-lg object-cover"
-                                                />
+                                                {renderAvatar(item.avatar, item.name)}
                                             </div>
 
                                             {/* 右侧信息 */}
@@ -507,26 +521,15 @@ export default function Chats({ activeMenu, setActiveMenu, setChatWith, setFrom,
                                 return (
                                     <div key={`contact-${item.id}`}>
                                         <div className="flex items-center space-x-4 border-b border-gray-100 h-17 pb-3 shrink-0"
-                                            onClick={() => {
-                                                setChatWith({ name: item.name, id: item.user_id, avatar: item.avatar });
-                                                setActiveMenu('聊天详情');
-                                                setFrom('聊天');
-
-                                                // 点击进入聊天时，立即清零未读数（UI优化）
-                                                setContacts(prev => prev.map(c =>
-                                                    c.user_id === item.user_id ? { ...c, count: 0 } : c
-                                                ));
-                                            }
-                                            }>
+                                            onClick={() => handleChatClick(
+                                                { name: item.name, id: item.user_id, avatar: item.avatar },
+                                                '聊天详情',
+                                                false
+                                            )}
+                                        >
                                             {/* 头像 + 在线状态 */}
                                             <div className="relative shrink-0 ml-3">
-                                                <img
-                                                    src={getAvatarUrl(item.avatar)}
-                                                    alt={item.name}
-                                                    width={48}
-                                                    height={48}
-                                                    className="w-12 h-12 rounded-lg object-cover"
-                                                />
+                                                {renderAvatar(item.avatar, item.name)}
                                                 {item.status === 'online' && (
                                                     <span className="absolute -bottom-1 left-9.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full" />
                                                 )}

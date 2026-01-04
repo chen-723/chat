@@ -5,6 +5,7 @@ import SERVER_CONFIG from '@/config/server';
 import { useState } from 'react';
 import Modal from 'antd/es/modal/Modal';
 import Alert from 'antd/es/alert/Alert';
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     onClose: () => void;
@@ -19,10 +20,22 @@ export default function ManageMember({ onClose, chatWith, selectedMember, curren
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [alertVisible, setAlertVisible] = useState(false);
 
-    // 处理头像URL：如果是相对路径，拼接base URL
-    const avatarUrl = selectedMember.avatar
-        ? (selectedMember.avatar.startsWith('http') ? selectedMember.avatar : `${SERVER_CONFIG.API_BASE_URL}${selectedMember.avatar}`)
-        : "/avatar/Profile.png";
+    // 渲染头像
+    const renderAvatar = () => {
+        if (selectedMember.avatar) {
+            const avatarUrl = selectedMember.avatar.startsWith('http') 
+                ? selectedMember.avatar 
+                : `${SERVER_CONFIG.API_BASE_URL}${selectedMember.avatar}`;
+            return (
+                <img
+                    src={avatarUrl}
+                    className="w-[100px] h-[100px] rounded-lg object-cover"
+                    alt={selectedMember.username}
+                />
+            );
+        }
+        return <InitialsAvatar name={selectedMember.username} size={100} className="rounded-lg" />;
+    };
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -71,15 +84,7 @@ export default function ManageMember({ onClose, chatWith, selectedMember, curren
                 {/* 成员信息 */}
                 <div className="mb-4 p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                        <img
-                            src={avatarUrl}
-                            alt={selectedMember.username}
-                            className="w-12 h-12 rounded-lg object-cover"
-                            onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = "/avatar/Profile.png";
-                            }}
-                        />
+                        {renderAvatar()}
                         <div>
                             <p className="font-semibold text-gray-800">{selectedMember.username}</p>
                             <p className="text-sm text-gray-500">

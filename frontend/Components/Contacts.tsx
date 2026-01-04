@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { getContacts, Contact } from '@/utils/api/contact';
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -95,11 +96,15 @@ export default function Contacts({ activeMenu, setActiveMenu, setChatWith, setFr
                                     }}>
                                     {/* 头像 + 在线状态 */}
                                     <div className="relative shrink-0">
-                                        <img
-                                            src={item.avatar || "/avatar/Profile.png"}
-                                            alt={item.name}
-                                            className="w-12 h-12 rounded-lg object-cover"
-                                        />
+                                        {item.avatar ? (
+                                            <img
+                                                src={item.avatar}
+                                                alt={item.name}
+                                                className="w-12 h-12 rounded-lg object-cover"
+                                            />
+                                        ) : (
+                                            <InitialsAvatar name={item.name} size={48} className="rounded-lg" />
+                                        )}
                                         {item.status === 'online' && (
                                             <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full" />
                                         )}

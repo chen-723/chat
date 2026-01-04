@@ -2,6 +2,7 @@
 import { LockOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { loginUser, registerUser } from "@/utils/api/auth";
+import { useClickDebounce } from '@/utils/useDebounce';
 
 type LoginProps = {
     setShowLogin: (value: boolean) => void;
@@ -16,7 +17,7 @@ export default function Login({ setShowLogin, ShowLogin, setTotalUnread }: Login
     const [loginForm, setLoginForm] = useState({ identifier: '', password: '' });
     const [regForm, setRegForm] = useState({ username: '', password: '', phone: '' });
 
-    const handleLogin = async () => {
+    const handleLogin = useClickDebounce(async () => {
         try {
             // 自动判断是手机号还是用户名（手机号是11位数字）
             const isPhone = /^1[3-9]\d{9}$/.test(loginForm.identifier);
@@ -41,9 +42,9 @@ export default function Login({ setShowLogin, ShowLogin, setTotalUnread }: Login
         } catch (e: any) {
             alert(e.message);
         }
-    };
+    }, 1500); // 1.5秒内只能点击一次
 
-    const handleRegister = async () => {
+    const handleRegister = useClickDebounce(async () => {
         try {
             await registerUser(regForm.username, regForm.password, regForm.phone);
             alert("注册成功，即将自动登录…");
@@ -71,8 +72,7 @@ export default function Login({ setShowLogin, ShowLogin, setTotalUnread }: Login
             setRegForm({ username: '', password: '', phone: '' });
             setShowRegister(false);
         }
-
-    }
+    }, 1500); // 1.5秒内只能点击一次
 
     //回车确认监听
     useEffect(() => {
@@ -98,15 +98,14 @@ export default function Login({ setShowLogin, ShowLogin, setTotalUnread }: Login
         <div>
             {/* 登录页面 */}
             {!ShowRegister &&
-                <div className="">
-                    <div className="text-blue-500 flex justify-center relative mt-18 cursor-pointer"
-                    // onClick={() => setShowLogin(true)}
-                    >
+                <div className="h-screen flex flex-col">
+                    <div className="flex-[0.3]" />
+                    <div className="text-blue-500 flex justify-center relative cursor-pointer">
                         请登录
                     </div>
-                    <div className="flex justify-center mt-22 text-2xl">
+                    {/* <div className="flex justify-center mt-22 text-2xl">
                         这里应该是一个Logo
-                    </div>
+                    </div> */}
                     <div className="mt-10 mx-auto w-70">
                         <div className="flex flex-col space-y-6 relative">
                             <div>
@@ -153,6 +152,7 @@ export default function Login({ setShowLogin, ShowLogin, setTotalUnread }: Login
                             </button>
                         </div>
                     </div>
+                    <div className="flex-[0.7]" />
 
                 </div>
             }

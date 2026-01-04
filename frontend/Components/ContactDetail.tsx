@@ -6,6 +6,7 @@ import Alert from 'antd/es/alert/Alert';
 import Modal from 'antd/es/modal/Modal';
 import { useEffect, useState } from 'react';
 import Callpage from './Callpage'
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -96,11 +97,15 @@ export default function ContactDetail({ activeMenu, setActiveMenu, chatWith, fro
             <div>
                 <div className='flex justify-center mt-5'>
                     <div className="relative inline-block">
-                        <img
-                            src={contactDetail.avatar || "/avatar/Profile.png"}
-                            alt={contactDetail.name}
-                            className="w-[100px] h-[100px] rounded-lg object-cover"
-                        />
+                        {contactDetail.avatar ? (
+                            <img
+                                src={contactDetail.avatar}
+                                alt={contactDetail.name}
+                                className="w-[100px] h-[100px] rounded-lg object-cover"
+                            />
+                        ) : (
+                            <InitialsAvatar name={contactDetail.name} size={100} className="rounded-lg" />
+                        )}
                         <span
                             className={`absolute bottom-0 right-0 w-4.5 h-4.5 ${contactDetail.status === 'online' ? 'bg-green-500' : 'bg-gray-400'
                                 } border-2 border-white rounded-full z-10`}

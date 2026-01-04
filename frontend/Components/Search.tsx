@@ -7,6 +7,7 @@ import { MessageSearchResult, searchMessages } from '@/utils/api/messages'
 import SearchOutlined from "@ant-design/icons/lib/icons/SearchOutlined";
 import { useState, useEffect } from "react";
 import SERVER_CONFIG from '@/config/server';
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -130,10 +131,19 @@ export default function Search({ activeMenu, setActiveMenu, setChatWith }: Props
         }
     };
 
-    // 处理头像 URL
-    const getAvatarUrl = (avatar: string | null | undefined) => {
-        if (!avatar) return '/avatar/Profile.png';
-        return avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+    // 渲染头像
+    const renderAvatar = (avatar: string | null | undefined, name: string, size: number = 48) => {
+        if (avatar) {
+            const avatarUrl = avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+            return (
+                <img
+                    src={avatarUrl}
+                    className="w-12 h-12 rounded-lg object-cover"
+                    alt={name}
+                />
+            );
+        }
+        return <InitialsAvatar name={name} size={size} className="rounded-lg" />;
     };
 
     if (activeMenu !== "搜索") return null;
@@ -201,11 +211,7 @@ export default function Search({ activeMenu, setActiveMenu, setChatWith }: Props
                                 className="flex items-center space-x-4 border-b border-gray-100 h-17 pb-3 shrink-0 hover:bg-gray-50 cursor-pointer"
                                 onClick={() => onUserClick(u)}>
                                 <div className="relative shrink-0 ml-3">
-                                    <img
-                                        src={getAvatarUrl(u.avatar)}
-                                        className="w-12 h-12 rounded-lg object-cover"
-                                        alt=""
-                                    />
+                                    {renderAvatar(u.avatar, u.username)}
                                 </div>
                                 <div className="flex flex-1 min-w-0 justify-between gap-2 mr-3">
                                     <div className="min-w-0 flex-1">
@@ -236,11 +242,7 @@ export default function Search({ activeMenu, setActiveMenu, setChatWith }: Props
                                 onClick={() => onGroupClick(u)}
                             >
                                 <div className="relative shrink-0 ml-3">
-                                    <img
-                                        src={getAvatarUrl(u.avatar)}
-                                        className="w-12 h-12 rounded-lg object-cover"
-                                        alt=""
-                                    />
+                                    {renderAvatar(u.avatar, u.name)}
                                 </div>
                                 <div className="flex flex-1 min-w-0 justify-between gap-2 mr-3">
                                     <div className="min-w-0 flex-1">
@@ -272,15 +274,10 @@ export default function Search({ activeMenu, setActiveMenu, setChatWith }: Props
                             >
                                 {/* 头像：私聊显示对方头像，群聊显示群头像 */}
                                 <div className="relative shrink-0 ml-3">
-                                    <img
-                                        src={
-                                            item.message.chat_type === "private"
-                                                ? getAvatarUrl(item.message.chat_info.peer_avatar)
-                                                : getAvatarUrl(item.message.chat_info.group_avatar)
-                                        }
-                                        className="w-12 h-12 rounded-lg object-cover"
-                                        alt=""
-                                    />
+                                    {item.message.chat_type === "private"
+                                        ? renderAvatar(item.message.chat_info.peer_avatar, item.message.chat_info.peer_username ?? 'Unknown')
+                                        : renderAvatar(item.message.chat_info.group_avatar, item.message.chat_info.group_name ?? 'Unknown')
+                                    }
                                 </div>
 
                                 <div className="flex flex-1 min-w-0 justify-between gap-2 mr-3">

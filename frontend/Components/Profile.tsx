@@ -4,6 +4,7 @@ import { getMe, uploadBio, uploadUsername } from "@/utils/api/auth";
 import { getContacts, Contact } from '@/utils/api/contact';
 import { Alert } from 'antd';
 import { getGroups, Groups } from '@/utils/api/group'
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -111,11 +112,15 @@ export default function Profile({ activeMenu, setActiveMenu, setChatWith, setFro
                 <div>
                     <div className='flex justify-center mt-5'>
                         <div className="relative inline-block">
-                            <img
-                                src={user.avatar || "/avatar/Profile.png"}
-                                alt={""}
-                                className="w-[100px] h-[100px] rounded-lg object-cover"
-                            />
+                            {user.avatar ? (
+                                <img
+                                    src={user.avatar}
+                                    alt={""}
+                                    className="w-[100px] h-[100px] rounded-lg object-cover"
+                                />
+                            ) : (
+                                <InitialsAvatar name={user.username || "User"} size={100} className="rounded-lg" />
+                            )}
                             <span className="absolute bottom-0 right-0 w-4.5 h-4.5 bg-green-500 border-2 border-white rounded-full z-10" />
                         </div>
                     </div>
@@ -216,11 +221,15 @@ export default function Profile({ activeMenu, setActiveMenu, setChatWith, setFro
                                         }>
                                         {/* 头像 + */}
                                         <div className="relative shrink-0">
-                                            <img
-                                                src={item.avatar || "/avatar/Profile.png"}
-                                                alt={item.name}
-                                                className="w-12 h-12 rounded-lg object-cover"
-                                            />
+                                            {item.avatar ? (
+                                                <img
+                                                    src={item.avatar}
+                                                    alt={item.name}
+                                                    className="w-12 h-12 rounded-lg object-cover"
+                                                />
+                                            ) : (
+                                                <InitialsAvatar name={item.name} size={48} className="rounded-lg" />
+                                            )}
                                             {item.status === 'online' && (
                                                 <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full" />
                                             )}
@@ -256,11 +265,15 @@ export default function Profile({ activeMenu, setActiveMenu, setChatWith, setFro
                                         }>
                                         {/* 头像 + */}
                                         <div className="relative shrink-0">
-                                            <img
-                                                src={item.avatar || "/avatar/Profile.png"}
-                                                alt={item.name}
-                                                className="w-12 h-12 rounded-lg object-cover"
-                                            />
+                                            {item.avatar ? (
+                                                <img
+                                                    src={item.avatar}
+                                                    alt={item.name}
+                                                    className="w-12 h-12 rounded-lg object-cover"
+                                                />
+                                            ) : (
+                                                <InitialsAvatar name={item.name} size={48} className="rounded-lg" />
+                                            )}
                                         </div>
 
                                         {/* 右侧信息 */}

@@ -1,6 +1,7 @@
 import { getMe, searchUsers, UserResponse } from "@/utils/api/auth";
 import SearchOutlined from "@ant-design/icons/lib/icons/SearchOutlined";
 import { useEffect, useState } from "react";
+import InitialsAvatar from './InitialsAvatar';
 
 
 type Props = {
@@ -86,11 +87,17 @@ export default function addFriend({ onClose, setActiveMenu, setChatWith }: Props
                                 className="flex items-center p-3.5 hover:bg-gray-100 cursor-pointer border-t first:border-t-0 border-gray-200"
                                 onClick={() => onUserClick(u)}
                             >
-                                <img
-                                    src={u.avatar || "/avatar/Profile.png"}
-                                    className="w-12 h-12 rounded-full mr-3 object-cover shrink-0"
-                                    alt=""
-                                />
+                                {u.avatar ? (
+                                    <img
+                                        src={u.avatar}
+                                        className="w-12 h-12 rounded-full mr-3 object-cover shrink-0"
+                                        alt=""
+                                    />
+                                ) : (
+                                    <div className="mr-3 shrink-0">
+                                        <InitialsAvatar name={u.username} size={48} className="rounded-full" />
+                                    </div>
+                                )}
                                 <div className="min-w-0 flex-1">
                                     <div className="font-bold truncate">{u.username}</div>
                                     <div className="text-sm text-gray-500 truncate">

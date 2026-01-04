@@ -5,6 +5,7 @@ import { addGroupMembers } from "@/utils/api/group";
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 import Alert from 'antd/es/alert/Alert';
 import { useState, useEffect } from "react";
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     onClose: () => void;
@@ -114,11 +115,17 @@ export default function AddList({ onClose, groupDetailId, onMemberAdded }: Props
                                 className="flex items-center p-3.5 hover:bg-gray-100 cursor-pointer border-t first:border-t-0 border-gray-200"
                                 onClick={() => onAddGroupMembers(u)}
                             >
-                                <img
-                                    src={u.avatar || "/avatar/Profile.png"}
-                                    className="w-12 h-12 rounded-full mr-3 object-cover shrink-0"
-                                    alt=""
-                                />
+                                {u.avatar ? (
+                                    <img
+                                        src={u.avatar}
+                                        className="w-12 h-12 rounded-full mr-3 object-cover shrink-0"
+                                        alt=""
+                                    />
+                                ) : (
+                                    <div className="mr-3 shrink-0">
+                                        <InitialsAvatar name={u.username} size={48} className="rounded-full" />
+                                    </div>
+                                )}
                                 <div className="min-w-0 flex-1">
                                     <div className="font-bold truncate">{u.username}</div>
                                     <div className="text-sm text-gray-500 truncate">

@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import ChatMegSend from "./ChatMegSend";
 import { getGroupMessages, GroupMessages, sendGroupMessages } from "@/utils/api/groupmessages";
 import { getGroupMembers, GroupMembers } from "@/utils/api/group";
+import InitialsAvatar from './InitialsAvatar';
 
 type Props = {
     activeMenu: string;
@@ -334,17 +335,26 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
                                 ? groupMembersdata.find(m => m.user_id === item.sender_id)
                                 : null;
 
-                            // 处理头像 URL
-                            const getAvatarUrl = (avatar: string | null | undefined) => {
-                                if (!avatar) return '/avatar/Profile.png';
-                                return avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+                            // 渲染头像
+                            const renderAvatar = (avatar: string | null | undefined, name: string) => {
+                                if (avatar) {
+                                    const avatarUrl = avatar.startsWith('http') ? avatar : `${SERVER_CONFIG.API_BASE_URL}${avatar}`;
+                                    return (
+                                        <img
+                                            src={avatarUrl}
+                                            alt={name}
+                                            className="w-11 h-11 rounded-lg object-cover"
+                                        />
+                                    );
+                                }
+                                return <InitialsAvatar name={name} size={44} className="rounded-lg" />;
                             };
 
                             const otherAvatar = isGroupChat && senderInfo
-                                ? getAvatarUrl(senderInfo.avatar)
-                                : getAvatarUrl(chatWith.avatar);
+                                ? renderAvatar(senderInfo.avatar, senderInfo.username)
+                                : renderAvatar(chatWith.avatar, chatWith.name);
 
-                            const myAvatar = getAvatarUrl(user.avatar);
+                            const myAvatar = renderAvatar(user.avatar, user.username || "我");
 
                             return (
                                 <div key={item.id}>
@@ -364,15 +374,9 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
 
                                     {isOtherSender ? (
                                         <div className="flex items-start mb-4.5">
-                                            <img
-                                                src={otherAvatar}
-                                                alt={
-                                                    isGroupChat && senderInfo
-                                                        ? senderInfo.username
-                                                        : chatWith.name
-                                                }
-                                                className="w-11 h-11 rounded-lg object-cover mr-2 shrink-0 self-center"
-                                            />
+                                            <div className="w-11 h-11 mr-2 shrink-0 self-center">
+                                                {otherAvatar}
+                                            </div>
                                             <div className="flex flex-col">
                                                 {isGroupChat && senderInfo && (
                                                     <span className="text-xs text-gray-500 mb-1 ml-1">
@@ -400,11 +404,9 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
                                                     )}
                                                 </div>
                                             </div>
-                                            <img
-                                                src={myAvatar}
-                                                alt={user.name}
-                                                className="w-11 h-11 rounded-lg object-cover shrink-0 self-center"
-                                            />
+                                            <div className="w-11 h-11 shrink-0 self-center">
+                                                {myAvatar}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
