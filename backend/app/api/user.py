@@ -24,21 +24,28 @@ class UsernameUpdate(BaseModel):
 
 
 @router.put("/me/avatar", response_model=UserResponse)
-def updata_avatar(
+async def updata_avatar(
     avatar: UploadFile,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 
 ):
-    if avatar.content_type not in ["image/jpeg", "image/png"]:
-        raise HTTPException(400, "只能上传jpg.png哦~")
+    from app.core.config import settings
     
-    ext= avatar.filename.split(".")[-1]
+    if avatar.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
+        raise HTTPException(400, "只能上传 JPG 或 PNG 格式的图片")
+    
+    # 读取文件内容检查大小
+    content = await avatar.read()
+    if len(content) > settings.MAX_AVATAR_SIZE:
+        raise HTTPException(413, f"图片大小不能超过 {settings.MAX_AVATAR_SIZE // 1024 // 1024}MB")
+    
+    ext = avatar.filename.split(".")[-1]
     file_name = f"{uuid.uuid4().hex}.{ext}"
     file_path = os.path.join(AVATAR_DIR, file_name)
 
     with open(file_path, "wb") as f:
-        shutil.copyfileobj(avatar.file, f)
+        f.write(content)
 
     current_user.avatar = f"/{AVATAR_DIR}/{file_name}"
     db.commit()

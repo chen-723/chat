@@ -142,7 +142,7 @@ def delete_group(
 
 
 @router.post("/{group_id}/avatar")
-def upload_group_avatar(
+async def upload_group_avatar(
     group_id: int,
     avatar: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -157,15 +157,22 @@ def upload_group_avatar(
     说明：
         仅群主和管理员可操作，头像保存到 avatars 目录（不会被定期清理）
     """
-    if avatar.content_type not in ["image/jpeg", "image/png"]:
+    from app.core.config import settings
+    
+    if avatar.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
         raise HTTPException(400, "只能上传 JPG 或 PNG 格式的图片")
+    
+    # 读取文件内容检查大小
+    content = await avatar.read()
+    if len(content) > settings.MAX_AVATAR_SIZE:
+        raise HTTPException(413, f"图片大小不能超过 {settings.MAX_AVATAR_SIZE // 1024 // 1024}MB")
     
     ext = avatar.filename.split(".")[-1]
     file_name = f"{uuid.uuid4().hex}.{ext}"
     file_path = os.path.join(AVATAR_DIR, file_name)
 
     with open(file_path, "wb") as f:
-        shutil.copyfileobj(avatar.file, f)
+        f.write(content)
 
     avatar_url = f"/static/avatars/{file_name}"
     

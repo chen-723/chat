@@ -65,24 +65,3 @@ app.include_router(websocket_router.router, tags=["WebSocket"])
 @app.get("/")
 def root():
     return {"msg": "FastAPI 聊天服务已启动"}
-
-
-@app.get("/health")
-def health_check():
-    """健康检查端点，用于监控服务状态"""
-    from app.db.database import engine
-    try:
-        # 测试数据库连接
-        with engine.connect() as conn:
-            conn.execute("SELECT 1")
-        return {
-            "status": "healthy",
-            "database": "connected",
-            "websocket_connections": len(manager.active_connections)
-        }
-    except Exception as e:
-        return {
-            "status": "unhealthy",
-            "database": "disconnected",
-            "error": str(e)
-        }

@@ -42,16 +42,22 @@ async def upload_file(
     """
     import uuid, os
     from pathlib import Path
+    from app.core.config import settings
 
     UPLOAD_DIR = Path("static/upload")
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+    # 读取文件内容检查大小
+    content = await file.read()
+    if len(content) > settings.MAX_FILE_SIZE:
+        raise HTTPException(413, f"文件大小不能超过 {settings.MAX_FILE_SIZE // 1024 // 1024}MB")
 
     ext = Path(file.filename).suffix
     name = f"{uuid.uuid4().hex}{ext}"
     file_path = UPLOAD_DIR / name
 
     with file_path.open("wb") as f:
-        f.write(await file.read())
+        f.write(content)
 
     return UploadResponse(url=f"/static/upload/{name}")
 

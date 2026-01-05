@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # ---------- 文件上传限制 ----------
+    MAX_AVATAR_SIZE: int = 2 * 1024 * 1024  # 2MB
+    MAX_FILE_SIZE: int = 10 * 1024 * 1024   # 10MB
+
     class Config:
         env_file = ".env"
         case_sensitive = True
