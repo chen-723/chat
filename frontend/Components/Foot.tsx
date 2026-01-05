@@ -14,7 +14,11 @@ export default function Foot({ activeMenu, setActiveMenu, totalUnread = 0 }: Pro
     return (
         <div>
             {['聊天', '联系人', '搜索', '用户'].includes(activeMenu) &&
-                <div className="absolute bottom-4 w-full text-center py-3.5 grid grid-cols-4 gap-4 border-t border-gray-200 pb-4 ">
+                <div className="absolute bottom-0 w-full text-center grid grid-cols-4 gap-4 border-t border-gray-200 bg-white" 
+                     style={{ 
+                       paddingTop: '0.875rem',
+                       paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))'
+                     }}>
                     <div onClick={() => setActiveMenu(Chats)}
                         className={`content-center cursor-pointer hover:text-blue-400 mt-2 relative
                      ${activeMenu === Chats ? 'text-blue-500 hover:text-blue-500' : 'text-gray-400 hover:text-blue-400'}`}>

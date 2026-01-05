@@ -305,7 +305,11 @@ export default function ChatMegSend({ text, setText, handleSend, chatWith, onMes
     };
 
     return (
-        <div className="w-full text-center py-5.5 border-t border-gray-200 bg-white relative">
+        <div className="w-full text-center border-t border-gray-200 bg-white relative"
+            style={{
+                paddingTop: '0.875rem',
+                paddingBottom: 'calc(2.25rem + env(safe-area-inset-bottom, 0px))'
+            }}>
             <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-b from-black/5 to-transparent" />
 
             {/* 隐藏的文件输入 */}
@@ -327,10 +331,14 @@ export default function ChatMegSend({ text, setText, handleSend, chatWith, onMes
                             }`}
                         title={isVoiceMode ? "切换到文本输入" : "切换到语音输入"}
                     >
-                        <svg className="w-5 h-5" fill={isVoiceMode ? "#002DE3" : "#ADB5BD"} viewBox="0 0 24 24">
-                            <path d="M12 2C10.3 2 9 3.3 9 5v8c0 1.7 1.3 3 3 3s3-1.3 3-3V5c0-1.7-1.3-3-3-3z" />
-                            <path d="M12 16c-1.7 0-3 1.3-3 3h6c0-1.7-1.3-3-3-3z" />
-                            <rect x="8" y="1" width="8" height="2" rx="1" fill={isVoiceMode ? "#002DE3" : "#ADB5BD"} />
+                        <svg
+                            className="w-5 h-5"
+                            fill={isVoiceMode ? "#002DE3" : "#ADB5BD"}
+                            viewBox="0 0 1024 1024"
+                        >
+                            <path
+                                d="M490.666667 809.856c-136.149333-10.346667-244.842667-119.04-255.189334-255.189333h42.816C289.066667 674.282667 389.589333 768 512 768s222.933333-93.717333 233.706667-213.333333h42.816c-10.346667 136.149333-119.04 244.842667-255.189334 255.189333V896h170.666667v42.666667H320v-42.666667h170.666667v-86.144zM512 85.333333a192 192 0 0 1 192 192v256a192 192 0 0 1-384 0V277.333333a192 192 0 0 1 192-192z m0 42.666667a149.333333 149.333333 0 0 0-149.333333 149.333333v256a149.333333 149.333333 0 0 0 298.666666 0V277.333333a149.333333 149.333333 0 0 0-149.333333-149.333333z"
+                            />
                         </svg>
                     </button>
                 </div>

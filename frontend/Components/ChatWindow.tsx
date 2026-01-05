@@ -9,6 +9,7 @@ import ChatMegSend from "./ChatMegSend";
 import { getGroupMessages, GroupMessages, sendGroupMessages } from "@/utils/api/groupmessages";
 import { getGroupMembers, GroupMembers } from "@/utils/api/group";
 import InitialsAvatar from './InitialsAvatar';
+import ImageViewer from './ImageViewer';
 
 type Props = {
     activeMenu: string;
@@ -26,6 +27,12 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
     // 追踪输入框容器的高度
     const [inputHeight, setInputHeight] = useState(100);
     const inputContainerRef = useRef<HTMLDivElement>(null);
+
+    // 图片查看器状态
+    const [viewingImage, setViewingImage] = useState<string | null>(null);
+
+    // 消息列表容器的引用
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     //区分私聊还是群聊
     const isGroupChat = activeMenu === "群聊天详情";
@@ -228,8 +235,8 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
                     <img
                         src={msg.content}
                         alt="图片"
-                        className="max-w-[280px] max-h-[280px] w-auto h-auto rounded-lg cursor-pointer object-contain"
-                        onClick={() => window.open(msg.content, '_blank')}
+                        className="max-w-[240px] max-h-[240px] w-auto h-auto rounded-lg cursor-pointer object-contain"
+                        onClick={() => setViewingImage(msg.content)}
                         onError={handleImageError}
                         loading="lazy"
                     />
@@ -302,6 +309,59 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
         return () => resizeObserver.disconnect();
     }, []);
 
+    // 滚动到底部的函数
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+        }
+    };
+
+    // 当消息列表更新时滚动到底部
+    useEffect(() => {
+        // 立即滚动一次
+        scrollToBottom();
+
+        // 等待图片加载完成后再次滚动
+        const images = document.querySelectorAll('img[loading="lazy"]');
+        let loadedCount = 0;
+        const totalImages = images.length;
+
+        if (totalImages === 0) {
+            // 如果没有图片，延迟一下确保 DOM 更新
+            const timer = setTimeout(scrollToBottom, 200);
+            return () => clearTimeout(timer);
+        }
+
+        const handleImageLoad = () => {
+            loadedCount++;
+            if (loadedCount === totalImages) {
+                scrollToBottom();
+            }
+        };
+
+        images.forEach((img) => {
+            if ((img as HTMLImageElement).complete) {
+                handleImageLoad();
+            } else {
+                img.addEventListener('load', handleImageLoad);
+                img.addEventListener('error', handleImageLoad); // 加载失败也要计数
+            }
+        });
+
+        // 设置一个最大等待时间（2秒），防止某些图片一直不加载
+        const maxWaitTimer = setTimeout(() => {
+            scrollToBottom();
+        }, 2000);
+
+        return () => {
+            clearTimeout(maxWaitTimer);
+            images.forEach((img) => {
+                img.removeEventListener('load', handleImageLoad);
+                img.removeEventListener('error', handleImageLoad);
+            });
+        };
+    }, [messages]);
+
     return (
         <div>
             {(
@@ -314,10 +374,6 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
                         msOverflowStyle: 'none',
                         paddingBottom: `${inputHeight + 16}px`,
                     }}
-                        ref={(node) => {
-                            // 每次组件渲染完都把滚动条滚到底
-                            if (node) node.scrollTop = node.scrollHeight;
-                        }}
                     >
                         {messages.map((item) => {
                             const curDate = dayjs(item.created_at).format('YYYY-MM-DD');
@@ -374,7 +430,7 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
 
                                     {isOtherSender ? (
                                         <div className="flex items-start mb-4.5">
-                                            <div className="w-11 h-11 mr-2 shrink-0 self-center">
+                                            <div className="w-11 h-11 mr-2 shrink-0 self-start">
                                                 {otherAvatar}
                                             </div>
                                             <div className="flex flex-col">
@@ -404,7 +460,7 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="w-11 h-11 shrink-0 self-center">
+                                            <div className="w-11 h-11 shrink-0 self-start">
                                                 {myAvatar}
                                             </div>
                                         </div>
@@ -412,6 +468,8 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
                                 </div>
                             );
                         })}
+                        {/* 用于滚动定位的空元素 */}
+                        <div ref={messagesEndRef} />
                     </div>
                     {/* 消息发送组件 */}
                     <div ref={inputContainerRef} className="absolute bottom-0 left-0 right-0">
@@ -426,6 +484,14 @@ export default function ChatWindow({ activeMenu, chatWith }: Props) {
                     </div>
                 </div>
             }
+
+            {/* 图片查看器 */}
+            {viewingImage && (
+                <ImageViewer
+                    imageUrl={viewingImage}
+                    onClose={() => setViewingImage(null)}
+                />
+            )}
         </div>
     )
 }

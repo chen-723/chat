@@ -158,3 +158,30 @@ export async function searchGroups(token: string, keyword: string): Promise<Grou
   
   return res.json() as Promise<Groups[]>;
 }
+
+// 上传群头像
+export async function uploadGroupAvatar(token: string, groupId: number, file: File): Promise<{ url: string; group: Groups }> {
+  // 压缩图片（质量50%，最大宽度800px）
+  const { compressImage } = await import('@/utils/imageCompressor');
+  const compressedFile = await compressImage(file, {
+    quality: 0.5,
+    maxWidth: 800,
+    maxHeight: 800,
+  });
+
+  const formData = new FormData();
+  formData.append('avatar', compressedFile);
+
+  const res = await fetch(`${BASE_URL}/${groupId}/avatar`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || '上传群头像失败');
+  }
+
+  return res.json();
+}

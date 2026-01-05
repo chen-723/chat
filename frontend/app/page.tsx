@@ -11,6 +11,8 @@ import Search from '@/Components/Search';
 import ContactDetail from '@/Components/ContactDetail'
 import GroupsDetail from '@/Components/GroupsDetail'
 import Callpage from '@/Components/Callpage';
+import { setupIOSInputFix } from '@/utils/iosInputFix';
+
 export default function Home() {
 
   const [activeMenu, setActiveMenu] = useState<string>('聊天');
@@ -49,6 +51,9 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // iOS 输入框修复
+    const cleanup = setupIOSInputFix();
+    
     // 只处理"页面刷新时已有 token"的情况
     const validateToken = async () => {
       const token = localStorage.getItem('token');
@@ -96,6 +101,7 @@ export default function Home() {
 
     // 组件卸载时关闭WebSocket
     return () => {
+      cleanup?.();
       window.removeEventListener('beforeunload', handleBeforeUnload);
       import('@/utils/websocket').then(({ wsClient }) => {
         wsClient.close();

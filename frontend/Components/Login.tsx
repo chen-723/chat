@@ -107,9 +107,9 @@ export default function Login({ setShowLogin, ShowLogin, setTotalUnread }: Login
                         这里应该是一个Logo
                     </div> */}
                     <div className="mt-10 mx-auto w-70">
-                        <div className="flex flex-col space-y-6 relative">
-                            <div>
-                                <UserOutlined className='absolute left-2.5 top-3.5' />
+                        <div className="flex flex-col gap-4 space-y-6 relative">
+                            <div className='relative flex items-center'>
+                                <UserOutlined className='absolute left-3 z-10' />
                                 <input className="w-full border-gray-200 text-sm py-3 rounded-md pl-8 ring-gray-200 focus:ring-2 focus:outline-none bg-gray-100"
                                     placeholder="用户名 / 手机号"
                                     value={loginForm.identifier}
@@ -118,8 +118,8 @@ export default function Login({ setShowLogin, ShowLogin, setTotalUnread }: Login
                                     }
                                 />
                             </div>
-                            <div>
-                                <LockOutlined className='absolute left-2.5 top-20.5' />
+                            <div className='relative flex items-center'>
+                                <LockOutlined className='absolute left-3 z-10' />
                                 <input className="w-full border-gray-200 text-sm py-3 rounded-md pl-8 ring-gray-200 focus:ring-2 focus:outline-none bg-gray-100"
                                     placeholder="PassWord"
                                     type='password'

@@ -3,8 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  color-scheme: light;
-  /* 强制浅色模式 */
+  color-scheme: light; /* 强制浅色模式 */
 }
 
 @theme inline {
@@ -35,15 +34,22 @@ body {
 
 html {
   overflow-x: hidden;
+  overflow-y: auto;
   /* 禁止缩放 */
   touch-action: pan-y;
+  /* iOS PWA 固定高度 */
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 body {
   margin: 0 auto;
   max-width: 100%;
+  width: 100%;
+  height: 100%;
   min-height: 100vh;
-  background: #fafafa;
+  background: #fafafa; 
   touch-action: manipulation;
   /* 禁止文本选择和双击缩放 */
   user-select: none;
@@ -52,6 +58,19 @@ body {
   /* 禁止双击放大 */
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  /* iOS 防止橡皮筋效果 */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  /* 隐藏滚动条 */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* iOS PWA 专用：防止页面滚动 */
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* 隐藏滚动条 */
@@ -62,4 +81,100 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* 修复 iOS 输入框自动缩放问题 */
+input,
+textarea,
+select {
+  font-size: 16px !important; /* iOS Safari 需要至少 16px 才不会自动缩放 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* 防止输入时页面滚动 */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* 防止 iOS 在输入时缩放 */
+input:focus,
+textarea:focus,
+select:focus {
+  font-size: 16px !important;
+  /* 防止输入时出现滚动条 */
+  position: relative;
+  z-index: 1;
+}
+
+/* iOS 专用：防止输入时页面跳动和滚动条 */
+@supports (-webkit-touch-callout: none) {
+  body {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
+  
+  #__next {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #__next::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+/* 主容器样式 - 防止滚动条 */
+.main-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh; /* 动态视口高度，iOS 支持 */
+  overflow: hidden;
+}
+
+/* 所有滚动容器隐藏滚动条 */
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* iOS PWA 安全区域支持 */
+@supports (padding: max(0px)) {
+  body {
+    /* 为 iOS 刘海屏和底部指示器留出空间 */
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    /* 不设置 padding-bottom，让各组件自己处理 */
+  }
+  
+  /* 确保内容区域不被安全区域遮挡 */
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}
+
+/* iOS 底部导航栏和输入框适配 */
+@media (display-mode: standalone) {
+  /* PWA 模式下的特殊处理 */
+  .bottom-nav,
+  .bottom-input {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
 }

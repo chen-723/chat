@@ -47,15 +47,28 @@ export async function getMe(token: string) {
 
 // 4. 上传头像
 export async function uploadAvatar(token: string, file: File) {
+  // 动态导入压缩工具
+  const { compressImage } = await import('@/utils/imageCompressor');
+  
+  // 压缩图片（质量50%，最大宽度800px）
+  const compressedFile = await compressImage(file, {
+    quality: 0.5,
+    maxWidth: 800,
+    maxHeight: 800,
+  });
+
   const formData = new FormData();
-  formData.append('avatar', file);
+  formData.append('avatar', compressedFile);
 
   const res = await fetch(`${BASE_URL}/me/avatar`, {
     method: "PUT",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
-  if (!res.ok) throw new Error((await res.json()).detail || "上传失败");
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || "上传失败");
+  }
   return res.json(); // 返回更新后的用户信息
 }
 

@@ -72,14 +72,29 @@ export async function allunread(token: string) {
 
 // 5. 上传图片，语音，文件
 export async function uploadFile(token: string, file: File): Promise<string> {
+  let fileToUpload = file;
+
+  // 如果是图片，先压缩
+  if (file.type.startsWith('image/')) {
+    const { compressImage } = await import('@/utils/imageCompressor');
+    fileToUpload = await compressImage(file, {
+      quality: 0.5,
+      maxWidth: 1920,
+      maxHeight: 1920,
+    });
+  }
+
   const fd = new FormData();
-  fd.append('file', file);
+  fd.append('file', fileToUpload);
   const res = await fetch(`${BASE_URL}/upload`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: fd,
   });
-  if (!res.ok) throw new Error('上传失败');
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || '上传失败');
+  }
   const { url } = await res.json();
   return url;
 }
