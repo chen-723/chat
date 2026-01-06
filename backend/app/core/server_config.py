@@ -9,7 +9,7 @@ import os
 # 生产环境改为服务器IP，例如: '192.168.1.100'
 # SERVER_HOST = os.getenv("SERVER_HOST", "localhost")
 # SERVER_HOST = os.getenv("SERVER_HOST", "www.372810.xyz")
-SERVER_HOST = os.getenv("SERVER_HOST", "10.37.209.136")
+SERVER_HOST = os.getenv("SERVER_HOST", "192.168.35.136")
 
 # 服务器端口
 SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))

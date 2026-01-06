@@ -11,6 +11,7 @@ import Search from '@/Components/Search';
 import ContactDetail from '@/Components/ContactDetail'
 import GroupsDetail from '@/Components/GroupsDetail'
 import Callpage from '@/Components/Callpage';
+import PWAPrompt from '@/Components/PWAPrompt';
 import { setupIOSInputFix } from '@/utils/iosInputFix';
 
 export default function Home() {
@@ -112,6 +113,9 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col bg-white overflow-hidden">
       {/* <Test /> */}
+
+      {/* PWA 安装提示 */}
+      <PWAPrompt />
 
       <Login
         ShowLogin={ShowLogin}

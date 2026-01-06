@@ -73,3 +73,5 @@ frontend/certificates
 *.md
 *.pyc
 *.txt
+*.tar
+*.pnpm
